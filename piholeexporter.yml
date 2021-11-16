@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: piholeexporter
+  labels:
+    app: piholeexporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: piholeexporter
+  template:
+    metadata:
+      labels:
+        app: piholeexporter
+        name: piholeexplorer
+    spec:
+      containers:
+      - name: piholeexporter
+        image: remiflandrois/pihole-exporter:latest
+        imagePullPolicy: Always
+        env:
+        - name: PIHOLE_HOSTNAME
+          value: "10.0.0.101:8000"
+        - name: PIHOLE_PASSWORD
+          value: "piholeserver"
+        - name: INTERVAL
+          value: "30s"
+        - name: PORT
+          value: "9617"
+      affinity:
+         nodeAffinity:
+           requiredDuringSchedulingIgnoredDuringExecution:
+             nodeSelectorTerms:
+             - matchExpressions:
+               - key: kubernetes.io/hostname
+                 operator: In
+                 values:
+                 - worker01-rspi4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: piholeexporter-service
+  labels:
+    app: piholeexporter
+spec:
+  ports:
+  - port: 9617
+    protocol: TCP
+  selector:
+    app: piholeexporter
+---
