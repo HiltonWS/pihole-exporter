@@ -49,6 +49,8 @@ spec:
   ports:
   - port: 9617
     protocol: TCP
+  externalIPs:
+  - 10.0.0.101
   selector:
     app: piholeexporter
 ---
